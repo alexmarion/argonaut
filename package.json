@@ -1,0 +1,30 @@
+{
+  "name": "argonaut",
+  "version": "0.0.1",
+  "description": "A survival based game",
+  "main": "app/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexmarion/argonaut.git"
+  },
+  "author": "Alex Marion",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexmarion/argonaut/issues"
+  },
+  "homepage": "https://github.com/alexmarion/argonaut#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "react": "^16.12.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.6.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2"
+  }
+}
