@@ -17,8 +17,4 @@ process.on('SIGTERM', async () => {
 app.set('trust proxy', true);
 app.set('x-powered-by', false);
 
-app.get('/', (req, res) => {
-  res.sendStatus(200);
-});
-
 server.listen(9000);
