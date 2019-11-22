@@ -2,10 +2,10 @@
   "name": "argonaut",
   "version": "0.0.1",
   "description": "A survival based game",
-  "main": "app/server.js",
+  "main": "server/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app/server.js"
+    "start": "node server/index.js"
   },
   "repository": {
     "type": "git",
@@ -24,6 +24,7 @@
   "devDependencies": {
     "eslint": "^6.6.0",
     "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.18.2"
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-react": "^7.16.0"
   }
 }
