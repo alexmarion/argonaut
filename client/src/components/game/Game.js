@@ -3,6 +3,7 @@ import Board from '../board';
 import './Game.css';
 
 class Game extends React.Component {
+  // eslint-disable-next-line class-methods-use-this
   render() {
     return (
       <div className="game">
