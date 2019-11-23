@@ -20,3 +20,15 @@
 .App-link {
   color: #09d3ac;
 }
+
+.grid-box {
+  flex: 0 1 auto;
+  position: relative;
+}
+
+.grid-box::after {
+  content: "";
+  float: left;
+  display: block;
+  padding-top: 100%;
+}

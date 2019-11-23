@@ -1,0 +1,8 @@
+// Theme overrides
+$theme-colors: (
+  "primary": #7672F2,
+  "secondary": #DFE5F2,
+);
+
+// Bootstrap and its default variables
+@import "node_modules/bootstrap/scss/bootstrap";
