@@ -9,6 +9,11 @@ const WORLD_WIDTH = 800;
 const WOLRD_HEIGHT = 600;
 const STARTING_FOOD_COUNT = 10;
 
+const GAME_OBJECT_TAGS = {
+  food: Food,
+  agent: Agent,
+};
+
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 const getRandomGridPosition = () => ({
   x: getRandomInt(0, WORLD_WIDTH),
@@ -24,8 +29,12 @@ class World extends React.Component {
     // Fill the grid with initial food
     for(let i = 0; i < STARTING_FOOD_COUNT; i++) {
       const { x, y } = getRandomGridPosition();
-      grid[x][y] = <Food key={`food-${x}-${y}`} position={{ x, y }} />;
+      grid[x][y] = { type: 'food' };
     }
+
+    // Place an agent on the grid
+    const { x, y } = getRandomGridPosition();
+    grid[x][y] = { type: 'agent' };
 
     this.state = { grid };
   }
@@ -41,15 +50,29 @@ class World extends React.Component {
     clearInterval(this.tickInterval);
   }
 
+  renderGameObject(gameObject, position) {
+    if(gameObject == null || gameObject.type == null) {
+      return null;
+    }
+    const GameObjectTag = GAME_OBJECT_TAGS[gameObject.type];
+    if(GameObjectTag == null) {
+      return null;
+    }
+    return <GameObjectTag key={`${GameObjectTag}-${position.x}-${position.y}`} tick={this.state.tick} position={position} />;
+  }
+
   // eslint-disable-next-line class-methods-use-this
   render() {
+    const renderGrid = this.state.grid.map((gridX, x) =>
+      gridX.map((gameObject, y) =>
+        this.renderGameObject(gameObject, { x, y })));
+
     return (
       <div
         className="position-relative bg-primary m-auto"
         style={{ width: WORLD_WIDTH, height: WOLRD_HEIGHT }}
       >
-        <Agent tick={this.state.tick} />
-        {this.state.grid}
+        {renderGrid}
       </div>
     );
   }
