@@ -1,5 +1,4 @@
 import React from 'react';
-import './agent.css';
 
 const MIN = 0;
 const MAX = 3;
@@ -14,6 +13,7 @@ class Agent extends React.Component {
         x: 0,
         y: 0,
       },
+      radius: 10,
     };
   }
 
@@ -40,6 +40,8 @@ class Agent extends React.Component {
         style={{
           top: this.state.position.x,
           left: this.state.position.y,
+          width: `${this.state.radius}vw`,
+          height: `${this.state.radius}vw`,
         }}
       >
         <div className="d-flex align-items-center justify-content-center w-100 h-100">
