@@ -1,1 +1,1 @@
-export { default } from './food-view';
+export { default } from './food-container';

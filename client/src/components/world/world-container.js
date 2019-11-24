@@ -3,34 +3,46 @@ import Food from '../food';
 import Agent from '../agent';
 import './world.scss';
 
+// TODO: to make things easier I'm introducing boundaries for now. Eventually these will be removed
+const WORLD_WIDTH = 800;
+const WOLRD_HEIGHT = 600;
 const STARTING_FOOD_COUNT = 10;
-const getRandomPosition = () => Math.floor(Math.random() * 500);
+
+const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const getRandomGridPosition = () => ({
+  x: getRandomInt(0, WORLD_WIDTH),
+  y: getRandomInt(0, WOLRD_HEIGHT),
+});
 
 class World extends React.Component {
   constructor(props) {
     super(props);
+    // The grid represents each pixel currently rendered
+    const grid = Array(WORLD_WIDTH).fill(null).map(() => Array(WOLRD_HEIGHT).fill(null));
+
+    // Fill the grid with initial food
+    for(let i = 0; i < STARTING_FOOD_COUNT; i++) {
+      const { x, y } = getRandomGridPosition();
+      grid[x][y] = <Food key={`food-${x}-${y}`} position={{ x, y }} />;
+    }
+
     this.state = {
+      grid,
       agents: [],
-      foodPositions: Array.from({ length: STARTING_FOOD_COUNT }, () => ({
-        position: {
-          x: getRandomPosition(),
-          y: getRandomPosition(),
-        },
-      })),
+      // foodPositions: Array.from({ length: STARTING_FOOD_COUNT }, () => ({
+      //   position: {
+      //     x: getRandomPosition(),
+      //     y: getRandomPosition(),
+      //   },
+      // })),
     };
-
-    this.tick();
-  }
-
-  tick() {
-    this.tickInterval = setInterval(() => {
-      this.setState({ tick: this.state.tick === 0 ? 1 : 0 });
-    }, 15);
   }
 
   // eslint-disable-next-line class-methods-use-this
-  renderFood(position) {
-    return <Food key={`food-${position.x}-${position.y}`} position={position} />;
+  componentDidMount() {
+    // this.tickInterval = setInterval(() => {
+    //   this.setState({ tick: this.state.tick === 0 ? 1 : 0 });
+    // }, 15);
   }
 
   componentWillUnmount() {
@@ -39,11 +51,13 @@ class World extends React.Component {
 
   // eslint-disable-next-line class-methods-use-this
   render() {
-    const foodElements = this.state.foodPositions.map((food) => this.renderFood(food.position));
     return (
-      <div className="position-absolute w-100 h-100">
+      <div
+        className="position-relative bg-primary m-auto"
+        style={{ width: WORLD_WIDTH, height: WOLRD_HEIGHT }}
+      >
         <Agent tick={this.state.tick} />
-        {foodElements}
+        {this.state.grid}
       </div>
     );
   }
