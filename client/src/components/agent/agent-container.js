@@ -36,13 +36,15 @@ class Agent extends React.Component {
   render() {
     return (
       <div
-        className="agent bg-primary rounded-circle position-absolute"
+        className="agent bg-primary border border-dark rounded-circle position-absolute"
         style={{
           top: this.state.position.x,
           left: this.state.position.y,
         }}
       >
-        {this.state.position.x}
+        <div className="d-flex align-items-center justify-content-center w-100 h-100">
+          {this.state.position.x}
+        </div>
       </div>
     );
   }

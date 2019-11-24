@@ -1,6 +1,7 @@
 import React from 'react';
 import Food from '../food';
 import Agent from '../agent';
+import { TICK_MS } from '../../constants';
 import './world.scss';
 
 // TODO: to make things easier I'm introducing boundaries for now. Eventually these will be removed
@@ -26,23 +27,14 @@ class World extends React.Component {
       grid[x][y] = <Food key={`food-${x}-${y}`} position={{ x, y }} />;
     }
 
-    this.state = {
-      grid,
-      agents: [],
-      // foodPositions: Array.from({ length: STARTING_FOOD_COUNT }, () => ({
-      //   position: {
-      //     x: getRandomPosition(),
-      //     y: getRandomPosition(),
-      //   },
-      // })),
-    };
+    this.state = { grid };
   }
 
-  // eslint-disable-next-line class-methods-use-this
   componentDidMount() {
-    // this.tickInterval = setInterval(() => {
-    //   this.setState({ tick: this.state.tick === 0 ? 1 : 0 });
-    // }, 15);
+    // Create the world tick
+    this.tickInterval = setInterval(() => {
+      this.setState({ tick: this.state.tick === 0 ? 1 : 0 });
+    }, TICK_MS);
   }
 
   componentWillUnmount() {
