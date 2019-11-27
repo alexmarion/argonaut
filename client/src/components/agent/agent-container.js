@@ -19,6 +19,7 @@ class Agent extends React.Component {
 
   move() {
     const { position: { x, y } } = this.state;
+    // TODO: in the future this can be taken from props, the grid will update the state
     this.setState({
       position: {
         x: x + getRandomInt(),

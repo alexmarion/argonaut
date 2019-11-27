@@ -9,6 +9,8 @@ const WORLD_WIDTH = 800;
 const WOLRD_HEIGHT = 600;
 const STARTING_FOOD_COUNT = 10;
 
+const getRandomID = () => Math.random().toString(36).slice(2);
+
 const GAME_OBJECT_TAGS = {
   food: Food,
   agent: Agent,
@@ -47,7 +49,26 @@ class World extends React.Component {
   }
 
   componentWillUnmount() {
+    // Make sure the tick interval gets cleared
     clearInterval(this.tickInterval);
+  }
+
+  gameObjectMoved(oldPosition, newPosition) {
+    this.setState((prevState) => {
+      const grid = prevState.grid.map((gridX, x) => {
+        if(x === oldPosition.x) {
+          return gridX.map((gameObject, y) => {
+            // TODO: don't actually want to mutate this array I don't think.
+            // Need some way of batching until the next tick, then moving and doing collision checking all at once
+            // This function should append movements to an array and then the tick function should handle the movements and reset the array
+            return gameObject;
+          });
+        }
+        return gridX;
+      });
+      return grid;
+    });
+    // grid[oldPosition.x][oldPosition.y] = this.state.grid[oldPosition.x][oldPosition.y];
   }
 
   renderGameObject(gameObject, position) {
@@ -58,10 +79,11 @@ class World extends React.Component {
     if(GameObjectTag == null) {
       return null;
     }
+    // const gameObjectID = getRandomID();
+    // console.log(gameObjectID);
     return <GameObjectTag key={`${GameObjectTag}-${position.x}-${position.y}`} tick={this.state.tick} position={position} />;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   render() {
     const renderGrid = this.state.grid.map((gridX, x) =>
       gridX.map((gameObject, y) =>

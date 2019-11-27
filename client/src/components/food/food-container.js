@@ -5,7 +5,10 @@ import { TICK_MS } from '../../constants';
 class Food extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { timeToLive: 100 };
+    this.state = {
+      radius: 5,
+      timeToLive: 100,
+    };
   }
 
 
@@ -14,7 +17,7 @@ class Food extends React.Component {
       if(this.state.timeToLive <= 0) {
         clearInterval(this.timeToLiveInterval);
       } else {
-        this.setState((prevState) => ({ timeToLive: prevState.timeToLive - 5 }));
+        this.setState((prevState) => ({ timeToLive: prevState.timeToLive - 2 }));
       }
     }, TICK_MS);
   }
@@ -31,6 +34,8 @@ class Food extends React.Component {
           top: this.props.position.y,
           left: this.props.position.x,
           opacity: this.state.timeToLive / 100,
+          width: `${this.state.radius}vw`,
+          height: `${this.state.radius}vw`,
         }}
       >
       </div>
