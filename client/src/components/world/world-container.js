@@ -38,14 +38,19 @@ class World extends React.Component {
     const { x, y } = getRandomGridPosition();
     grid[x][y] = { type: 'agent' };
 
+    // Create an array for batching grid movements
+    this.gridMoves = [];
+
+    // Set the initial state
     this.state = { grid };
+
+    // Bind functions passed to children
+    this.gameObjectMoved = this.gameObjectMoved.bind(this);
   }
 
   componentDidMount() {
     // Create the world tick
-    this.tickInterval = setInterval(() => {
-      this.setState({ tick: this.state.tick === 0 ? 1 : 0 });
-    }, TICK_MS);
+    this.tickInterval = setInterval(() => this.tick(), TICK_MS);
   }
 
   componentWillUnmount() {
@@ -53,22 +58,33 @@ class World extends React.Component {
     clearInterval(this.tickInterval);
   }
 
-  gameObjectMoved(oldPosition, newPosition) {
-    this.setState((prevState) => {
-      const grid = prevState.grid.map((gridX, x) => {
-        if(x === oldPosition.x) {
-          return gridX.map((gameObject, y) => {
-            // TODO: don't actually want to mutate this array I don't think.
-            // Need some way of batching until the next tick, then moving and doing collision checking all at once
-            // This function should append movements to an array and then the tick function should handle the movements and reset the array
-            return gameObject;
-          });
+  tick() {
+    if(this.gridMoves.length) {
+      // Create a copy of the grid
+      const grid = JSON.parse(JSON.stringify(this.state.grid));
+      this.gridMoves.forEach((move) => {
+        const { oldPosition, newPosition } = move;
+        // Check that the move is legal
+        if(newPosition.x >= 0
+          && newPosition.x < WORLD_WIDTH
+          && newPosition.y >= 0
+          && newPosition.y < WOLRD_HEIGHT) {
+          grid[newPosition.x][newPosition.y] = grid[oldPosition.x][oldPosition.y];
+          grid[oldPosition.x][oldPosition.y] = null;
         }
-        return gridX;
+        console.log(newPosition);
       });
-      return grid;
-    });
-    // grid[oldPosition.x][oldPosition.y] = this.state.grid[oldPosition.x][oldPosition.y];
+
+      // Set the new grid and remove the old moves
+      this.setState({ grid });
+      this.gridMoves = [];
+    }
+
+    this.setState({ tick: this.state.tick === 0 ? 1 : 0 });
+  }
+
+  gameObjectMoved(oldPosition, newPosition) {
+    this.gridMoves.push({ oldPosition, newPosition });
   }
 
   renderGameObject(gameObject, position) {
@@ -81,7 +97,12 @@ class World extends React.Component {
     }
     // const gameObjectID = getRandomID();
     // console.log(gameObjectID);
-    return <GameObjectTag key={`${GameObjectTag}-${position.x}-${position.y}`} tick={this.state.tick} position={position} />;
+    return <GameObjectTag
+      key={`${GameObjectTag}-${position.x}-${position.y}`}
+      tick={this.state.tick}
+      position={position}
+      gameObjectMoved={this.gameObjectMoved}
+    />;
   }
 
   render() {
