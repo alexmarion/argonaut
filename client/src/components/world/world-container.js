@@ -1,12 +1,10 @@
 import React from 'react';
 import Food from '../food';
 import Agent from '../agent';
-import { TICK_MS } from '../../constants';
+import { TICK_MS, WORLD_WIDTH, WOLRD_HEIGHT } from '../../constants';
 import './world.scss';
 
 // TODO: to make things easier I'm introducing boundaries for now. Eventually these will be removed
-const WORLD_WIDTH = 800;
-const WOLRD_HEIGHT = 600;
 const STARTING_FOOD_COUNT = 10;
 
 const getRandomID = () => Math.random().toString(36).slice(2);
@@ -31,12 +29,12 @@ class World extends React.Component {
     // Fill the grid with initial food
     for(let i = 0; i < STARTING_FOOD_COUNT; i++) {
       const { x, y } = getRandomGridPosition();
-      grid[x][y] = { type: 'food' };
+      grid[x][y] = { type: 'food', radius: 1 };
     }
 
     // Place an agent on the grid
     const { x, y } = getRandomGridPosition();
-    grid[x][y] = { type: 'agent' };
+    grid[x][y] = { type: 'agent', radius: 5 };
 
     // Create an array for batching grid movements
     this.gridMoves = [];
@@ -64,16 +62,26 @@ class World extends React.Component {
       const grid = JSON.parse(JSON.stringify(this.state.grid));
       this.gridMoves.forEach((move) => {
         const { oldPosition, newPosition } = move;
-        // Check that the move is legal
+        // Check that the move is legal (and has changed the position)
         if(newPosition.x >= 0
           && newPosition.x < WORLD_WIDTH
           && newPosition.y >= 0
-          && newPosition.y < WOLRD_HEIGHT) {
+          && newPosition.y < WOLRD_HEIGHT
+          && (newPosition.x !== oldPosition.x || newPosition.y !== oldPosition.y)) {
           grid[newPosition.x][newPosition.y] = grid[oldPosition.x][oldPosition.y];
           grid[oldPosition.x][oldPosition.y] = null;
         }
-        console.log(newPosition);
       });
+
+      // Detect any collisions and perform required action(s)
+      /*
+      grid.forEach((gridX, x) => {
+        gridX.forEach((gameObject, y) => {
+          if(gameObject != null) {
+          }
+        });
+      });
+      */
 
       // Set the new grid and remove the old moves
       this.setState({ grid });
@@ -101,6 +109,7 @@ class World extends React.Component {
       key={`${GameObjectTag}-${position.x}-${position.y}`}
       tick={this.state.tick}
       position={position}
+      radius={gameObject.radius}
       gameObjectMoved={this.gameObjectMoved}
     />;
   }

@@ -6,7 +6,7 @@ class Food extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      radius: 5,
+      radius: this.props.radius,
       timeToLive: 100,
     };
   }
