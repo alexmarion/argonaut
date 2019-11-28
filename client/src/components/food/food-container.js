@@ -16,6 +16,7 @@ class Food extends React.Component {
     this.timeToLiveInterval = setInterval(() => {
       if(this.state.timeToLive <= 0) {
         clearInterval(this.timeToLiveInterval);
+        this.props.gameObjectMoved(this.props.position);
       } else {
         this.setState((prevState) => ({ timeToLive: prevState.timeToLive - 2 }));
       }

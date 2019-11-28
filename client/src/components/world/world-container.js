@@ -62,13 +62,21 @@ class World extends React.Component {
       const grid = JSON.parse(JSON.stringify(this.state.grid));
       this.gridMoves.forEach((move) => {
         const { oldPosition, newPosition } = move;
+        // If newPosition is null the element is removed
+        let removeOld = newPosition == null;
+
         // Check that the move is legal (and has changed the position)
-        if(newPosition.x >= 0
+        if(!removeOld
+          && newPosition.x >= 0
           && newPosition.x < WORLD_WIDTH
           && newPosition.y >= 0
           && newPosition.y < WOLRD_HEIGHT
           && (newPosition.x !== oldPosition.x || newPosition.y !== oldPosition.y)) {
           grid[newPosition.x][newPosition.y] = grid[oldPosition.x][oldPosition.y];
+          removeOld = true;
+        }
+
+        if(removeOld) {
           grid[oldPosition.x][oldPosition.y] = null;
         }
       });
