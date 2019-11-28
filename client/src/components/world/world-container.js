@@ -1,4 +1,5 @@
 import React from 'react';
+import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import Food from '../food';
 import Agent from '../agent';
 import { TICK_MS, WORLD_WIDTH, WOLRD_HEIGHT } from '../../constants';
@@ -19,6 +20,8 @@ const getRandomGridPosition = () => ({
   x: getRandomInt(0, WORLD_WIDTH),
   y: getRandomInt(0, WOLRD_HEIGHT),
 });
+
+const websocketClient = new W3CWebSocket('ws://127.0.0.1:9001');
 
 class World extends React.Component {
   constructor(props) {
@@ -49,6 +52,14 @@ class World extends React.Component {
   componentDidMount() {
     // Create the world tick
     this.tickInterval = setInterval(() => this.tick(), TICK_MS);
+
+    // Listen for websocket events
+    websocketClient.onopen = () => {
+      console.log('WebSocket Client Connected');
+    };
+    websocketClient.onmessage = (message) => {
+      console.log(message);
+    };
   }
 
   componentWillUnmount() {
