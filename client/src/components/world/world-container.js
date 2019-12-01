@@ -51,14 +51,16 @@ class World extends React.Component {
 
   componentDidMount() {
     // Create the world tick
-    this.tickInterval = setInterval(() => this.tick(), TICK_MS);
+    this.tickInterval = null; // setInterval(() => this.tick(), TICK_MS);
 
     // Listen for websocket events
     websocketClient.onopen = () => {
       console.log('WebSocket Client Connected');
     };
     websocketClient.onmessage = (message) => {
-      console.log(message);
+      const dataFromServer = JSON.parse(message.data);
+      console.log('Data from server', dataFromServer);
+      // TODO: change state based on data received
     };
   }
 
