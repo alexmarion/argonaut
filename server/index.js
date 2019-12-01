@@ -13,6 +13,15 @@ const websocketHttpServer = http.createServer();
 
 const closeServer = (server) => new Promise((r) => server.close(r));
 
+const WORLD_WIDTH = 800;
+const WOLRD_HEIGHT = 600;
+const grid1 = JSON.stringify(Array(WORLD_WIDTH).fill(null).map(() => Array(WOLRD_HEIGHT).fill(null)));
+const grid2 = JSON.stringify({});
+const grid3 = JSON.stringify(Array(WORLD_WIDTH).fill(null).map(() => Array(WOLRD_HEIGHT).fill({ type: 'agent', x: 1000, y: 300 })));
+console.log('grid1', grid1.length);
+console.log('grid2', grid2.length);
+console.log('grid3', grid3.length);
+
 // Shut down the server before exiting
 process.on('SIGTERM', async () => {
   try {
