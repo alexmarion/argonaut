@@ -32,34 +32,48 @@ class Grid {
     return this.dimension[coordinate];
   }
 
+  /**
+   * @description Sets data in the grid.
+   * @param {*} data
+   * @param {...number} coordinates
+   * @memberof Grid
+   */
   set(data, ...coordinates) {
     if(coordinates.length !== this.dimensions.length) {
       throw new Error(`${coordinates.length} coordinates passed does not match ${this.dimensions.length} dimensions declared.`);
     }
     const coordinate = coordinates[0];
     const isLast = coordinates.length === 1;
-    if(this.dimension[coordinate] == null) {
-      if(isLast) {
-        this.dimension[coordinate] = data;
-      } else {
-        this.dimension[coordinate] = new Grid(...this.dimensions.slice(1));
-        this.dimension[coordinate].set(data, ...coordinates.slice(1));
-      }
-    } else if(this.dimension[coordinate] instanceof Grid) {
-      if(isLast) {
-        throw new Error('THIS SHOULDNT GET HERE');
-      } else {
-        this.dimension[coordinate].set(data, ...this.dimensions.slice(1));
-      }
-    } else {
+    if(isLast) {
       this.dimension[coordinate] = data;
+    } else {
+      if(this.dimension[coordinate] == null) {
+        this.dimension[coordinate] = new Grid(...this.dimensions.slice(1));
+      }
+      this.dimension[coordinate].set(data, ...coordinates.slice(1));
     }
+  }
+
+  getAll() {
+    if(this.dimensions.length === 1) {
+      return this.dimension;
+    }
+    return Object.keys(this.dimension).reduce((collapsedGrid, idx) => {
+      // eslint-disable-next-line no-param-reassign
+      collapsedGrid[idx] = this.dimension[idx].getAll();
+      return collapsedGrid;
+    }, {});
   }
 }
 
-const test = new Grid(100, 100);
-console.log(test.get(0, 50));
-console.log(test.set('ok', 0, 50));
-console.log(test.get(0, 50));
-
+const xMax = 100;
+const yMax = 100;
+const test = new Grid(xMax, yMax);
+for(let x = 0; x < xMax; x++) {
+  for(let y = 0; y < yMax; y++) {
+    test.set(`${x}${y}`, x, y);
+  }
+}
+console.log(test.getAll());
+// console.log(test.get(99, 50));
 module.exports = Grid;
