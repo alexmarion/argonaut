@@ -5,6 +5,7 @@ const MAX = 3;
 const getRandomInt = () => (Math.floor(Math.random() * (MAX - MIN + 1)) + MIN)
   * (Math.random() < 0.5 ? -1 : 1);
 
+// TODO: this can probably be a stateless component
 class Agent extends React.Component {
   /*
   constructor(props) {

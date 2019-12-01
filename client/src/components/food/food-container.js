@@ -1,6 +1,6 @@
 import React from 'react';
 import './food.css';
-import { TICK_MS } from '../../constants';
+import { TICK_MS } from '../../../../constants';
 
 class Food extends React.Component {
   constructor(props) {

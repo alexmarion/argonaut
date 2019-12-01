@@ -2,11 +2,8 @@ import React from 'react';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import Food from '../food';
 import Agent from '../agent';
-import { TICK_MS, WORLD_WIDTH, WOLRD_HEIGHT } from '../../constants';
+import { TICK_MS, WORLD_WIDTH, WOLRD_HEIGHT, STARTING_FOOD_COUNT } from '../../../../constants';
 import './world.scss';
-
-// TODO: to make things easier I'm introducing boundaries for now. Eventually these will be removed
-const STARTING_FOOD_COUNT = 10;
 
 const getRandomID = () => Math.random().toString(36).slice(2);
 
