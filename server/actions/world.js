@@ -1,9 +1,18 @@
+import agent from './agent';
+import food from './food';
 import {
+  ACTION_TYPES,
+  GAME_OBJECT_TYPES,
   TICK_MS,
   WORLD_WIDTH,
   WOLRD_HEIGHT,
   STARTING_FOOD_COUNT,
 } from '../../constants';
+
+const gameObjects = {
+  [GAME_OBJECT_TYPES.FOOD]: food,
+  [GAME_OBJECT_TYPES.AGENT]: agent,
+};
 
 // Helper methods
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -21,12 +30,33 @@ const gridMoves = [];
 // Fill the grid with initial food
 for(let i = 0; i < STARTING_FOOD_COUNT; i++) {
   const { x, y } = getRandomGridPosition();
-  grid[x][y] = { type: 'food', radius: 1 };
+  grid[x][y] = { type: GAME_OBJECT_TYPES.FOOD, radius: 1 };
 }
 
 // Place an agent on the grid
-const { x, y } = getRandomGridPosition();
-grid[x][y] = { type: 'agent', radius: 5 };
+const initialAgentPosition = getRandomGridPosition();
+grid[initialAgentPosition.x][initialAgentPosition.y] = { type: GAME_OBJECT_TYPES.AGENT, radius: 5 };
+
+/**
+ * @description Iterate through the grid and tick each game object.
+ */
+function runGameObjectTicks() {
+  grid.forEach((gridX, x) => {
+    gridX.forEach((gameObject, y) => {
+      if(gameObject != null && gameObjects[gameObject.type] != null) {
+        const actions = gameObjects[gameObject.type].tick({ x, y });
+        if(actions && typeof actions === 'object') {
+          if(actions[ACTION_TYPES.MOVE]) {
+            // Add move into list of moves for this tick
+            gridMoves.push(actions[ACTION_TYPES.MOVE]);
+          } else if(actions[ACTION_TYPES.NEW_THING]) {
+            // TODO
+          }
+        }
+      }
+    });
+  });
+}
 
 /**
  * @description Performs game object movements registered in the gridMoves array.
@@ -66,6 +96,9 @@ function moveGameObjects() {
  * All functionality which occurs during a frame is called here.
  */
 function tick() {
+  // Get each action for the game elements
+  runGameObjectTicks();
+  // Perform all move actions
   moveGameObjects();
 }
 
