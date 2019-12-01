@@ -5,4 +5,4 @@ function tick() {
   console.log('FOOD TICK');
 }
 
-export default { tick };
+module.exports = { tick };

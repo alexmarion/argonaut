@@ -2,7 +2,11 @@ import React from 'react';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import Food from '../food';
 import Agent from '../agent';
-import { TICK_MS, WORLD_WIDTH, WOLRD_HEIGHT, STARTING_FOOD_COUNT } from '../../../../constants';
+import {
+  WORLD_WIDTH,
+  WOLRD_HEIGHT,
+  STARTING_FOOD_COUNT,
+} from '../../constants';
 import './world.scss';
 
 const getRandomID = () => Math.random().toString(36).slice(2);
@@ -57,6 +61,7 @@ class World extends React.Component {
     websocketClient.onmessage = (message) => {
       const dataFromServer = JSON.parse(message.data);
       console.log('Data from server', dataFromServer);
+      this.setState({ grid: dataFromServer });
       // TODO: change state based on data received
     };
   }
@@ -65,7 +70,7 @@ class World extends React.Component {
     // Make sure the tick interval gets cleared
     clearInterval(this.tickInterval);
   }
-
+  /*
   tick() {
     if(this.gridMoves.length) {
       // Create a copy of the grid
@@ -92,14 +97,12 @@ class World extends React.Component {
       });
 
       // Detect any collisions and perform required action(s)
-      /*
-      grid.forEach((gridX, x) => {
-        gridX.forEach((gameObject, y) => {
-          if(gameObject != null) {
-          }
-        });
-      });
-      */
+      // grid.forEach((gridX, x) => {
+      //   gridX.forEach((gameObject, y) => {
+      //     if(gameObject != null) {
+      //     }
+      //   });
+      // });
 
       // Set the new grid and remove the old moves
       this.setState({ grid });
@@ -108,6 +111,7 @@ class World extends React.Component {
 
     this.setState({ tick: this.state.tick === 0 ? 1 : 0 });
   }
+  */
 
   gameObjectMoved(oldPosition, newPosition) {
     this.gridMoves.push({ oldPosition, newPosition });
@@ -125,7 +129,7 @@ class World extends React.Component {
     // console.log(gameObjectID);
     return <GameObjectTag
       key={`${GameObjectTag}-${position.x}-${position.y}`}
-      tick={this.state.tick}
+      // tick={this.state.tick}
       position={position}
       radius={gameObject.radius}
       gameObjectMoved={this.gameObjectMoved}

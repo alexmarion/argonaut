@@ -1,13 +1,12 @@
-import agent from './agent';
-import food from './food';
-import {
+const agent = require('./agent');
+const food = require('./food');
+const {
   ACTION_TYPES,
   GAME_OBJECT_TYPES,
-  TICK_MS,
   WORLD_WIDTH,
   WOLRD_HEIGHT,
   STARTING_FOOD_COUNT,
-} from '../../constants';
+} = require('../../client/src/constants');
 
 const gameObjects = {
   [GAME_OBJECT_TYPES.FOOD]: food,
@@ -22,10 +21,11 @@ const getRandomGridPosition = () => ({
 });
 
 // Create a grid to save the current state of the world
+// TODO: To optimize performance change grid from array[array] to object[object]. No need to store empty values.
 const grid = Array(WORLD_WIDTH).fill(null).map(() => Array(WOLRD_HEIGHT).fill(null));
 
 // Create an array for batching movements. These moves are performed on tick
-const gridMoves = [];
+let gridMoves = [];
 
 // Fill the grid with initial food
 for(let i = 0; i < STARTING_FOOD_COUNT; i++) {
@@ -62,10 +62,11 @@ function runGameObjectTicks() {
  * @description Performs game object movements registered in the gridMoves array.
  */
 function moveGameObjects() {
+  console.log(JSON.stringify(gridMoves));
   if(gridMoves.length) {
     gridMoves.forEach((move) => {
       // Verify that each move is of the correct type
-      if(move != null && typeof move === 'object') {
+      if(move != null && typeof move === 'object' && move.oldPosition != null) {
         const { oldPosition, newPosition } = move;
 
         // If newPosition is null the element is removed
@@ -88,19 +89,23 @@ function moveGameObjects() {
         }
       }
     });
+
+    // Emptry the moves array
+    gridMoves = [];
   }
 }
 
 /**
  * @description This is the brain of the world.
  * All functionality which occurs during a frame is called here.
+ * @returns {Object[]} TODO: for simplicity this returns a grid reference
  */
 function tick() {
   // Get each action for the game elements
   runGameObjectTicks();
   // Perform all move actions
   moveGameObjects();
+  return grid;
 }
 
-// Start the tick
-setInterval(tick, TICK_MS);
+module.exports = { tick };

@@ -1,4 +1,4 @@
-import { ACTION_TYPES } from '../../constants';
+const { ACTION_TYPES } = require('../../client/src/constants');
 
 const MIN_MOVE = 0;
 const MAX_MOVE = 1;
@@ -28,8 +28,8 @@ function move({ x, y }) {
  * @param {Position} position
  */
 function tick(position) {
-  const newMove = move(position);
-  return { [ACTION_TYPES.MOVE]: newMove };
+  const newPosition = move(position);
+  return { [ACTION_TYPES.MOVE]: { oldPosition: position, newPosition } };
 }
 
-export default { tick };
+module.exports = { tick };

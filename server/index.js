@@ -1,6 +1,8 @@
 const http = require('http');
 const express = require('express');
 const { server: WebsocketServer } = require('websocket');
+const world = require('./actions/world');
+const { TICK_MS } = require('../client/src/constants');
 
 const EXPRESS_PORT = 9000;
 const WEBSOCKET_PORT = 9001;
@@ -45,11 +47,11 @@ const sendMessage = (json) => {
   });
 };
 
-const testMessage = JSON.stringify({ ping: 'ok' });
+// TODO: move this to the world routes file
 setInterval(() => {
-  console.log('SENDING JSON', testMessage);
-  sendMessage(testMessage);
-}, 2000);
+  const gridMessage = JSON.stringify(world.tick());
+  sendMessage(gridMessage);
+}, TICK_MS);
 
 websocketServer.on('request', (request) => {
   const userID = getUniqueID();
