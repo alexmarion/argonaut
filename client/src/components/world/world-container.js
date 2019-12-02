@@ -64,6 +64,8 @@ class World extends React.Component {
       this.tickQueue.push(dataFromServer);
     };
 
+    // TODO: need a better way of animating than updating state.
+    // Frame rate of setState simply isn't fast enough for smooth animation
     // Wait 1 seconds before starting tick
     this.tickTimeout = setTimeout(() => {
       this.tickInterval = setInterval(() => {
