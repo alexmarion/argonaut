@@ -50,8 +50,24 @@ const sendMessage = (json) => {
 // TODO: move this to the world routes file
 setInterval(() => {
   const grid = world.tick().getAll();
-  const gridMessage = JSON.stringify();
-  sendMessage(gridMessage);
+  /*
+  // Split grid into chunks for faster sending
+  Object.keys(grid).reduce((chunks, coordinate) => {
+    let i = 3;
+    if(coordinate <= 200) {
+      i = 0;
+    } else if(coordinate <= 400) {
+      i = 1;
+    } else if(coordinate <= 600) {
+      i = 2;
+    }
+    chunks[i][coordinate] = grid[coordinate];
+    return chunks;
+  }, [{}, {}, {}, {}]).forEach((chunk) => {
+    sendMessage(JSON.stringify(chunk));
+  });
+  */
+  sendMessage(JSON.stringify(grid));
 }, TICK_MS);
 
 websocketServer.on('request', (request) => {
