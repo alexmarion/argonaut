@@ -60,8 +60,8 @@ class World extends React.Component {
     };
     websocketClient.onmessage = (message) => {
       const dataFromServer = JSON.parse(message.data);
-      console.log('Data from server', dataFromServer);
-      this.setState({ grid: dataFromServer });
+      console.log('Data from server', dataFromServer, `${(message.data.length * 2) / 1000000} MB`);
+      // this.setState({ grid: dataFromServer });
       // TODO: change state based on data received
     };
   }

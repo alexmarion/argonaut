@@ -3,11 +3,11 @@
 // Will move after ejecting.
 module.exports = {
   ACTION_TYPES: Object.freeze({
-    MOVE: 'move',
+    MOVE: 0,
   }),
   GAME_OBJECT_TYPES: Object.freeze({
-    FOOD: 'food',
-    AGENT: 'agent',
+    FOOD: 0,
+    AGENT: 1,
   }),
   TICK_MS: 1000,
   WORLD_WIDTH: 800,

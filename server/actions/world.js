@@ -1,3 +1,4 @@
+const Grid = require('./grid');
 const agent = require('./agent');
 const food = require('./food');
 const {
@@ -21,8 +22,7 @@ const getRandomGridPosition = () => ({
 });
 
 // Create a grid to save the current state of the world
-// TODO: To optimize performance change grid from array[array] to object[object]. No need to store empty values.
-const grid = Array(WORLD_WIDTH).fill(null).map(() => Array(WOLRD_HEIGHT).fill(null));
+const grid = new Grid(WORLD_WIDTH, WOLRD_HEIGHT);
 
 // Create an array for batching movements. These moves are performed on tick
 let gridMoves = [];
@@ -30,31 +30,32 @@ let gridMoves = [];
 // Fill the grid with initial food
 for(let i = 0; i < STARTING_FOOD_COUNT; i++) {
   const { x, y } = getRandomGridPosition();
-  grid[x][y] = { type: GAME_OBJECT_TYPES.FOOD, radius: 1 };
+  grid.set({ type: GAME_OBJECT_TYPES.FOOD, radius: 1 }, x, y);
 }
 
 // Place an agent on the grid
 const initialAgentPosition = getRandomGridPosition();
-grid[initialAgentPosition.x][initialAgentPosition.y] = { type: GAME_OBJECT_TYPES.AGENT, radius: 5 };
+grid.set({
+  type: GAME_OBJECT_TYPES.AGENT,
+  radius: 5,
+}, initialAgentPosition.x, initialAgentPosition.y);
 
 /**
  * @description Iterate through the grid and tick each game object.
  */
 function runGameObjectTicks() {
-  grid.forEach((gridX, x) => {
-    gridX.forEach((gameObject, y) => {
-      if(gameObject != null && gameObjects[gameObject.type] != null) {
-        const actions = gameObjects[gameObject.type].tick({ x, y });
-        if(actions && typeof actions === 'object') {
-          if(actions[ACTION_TYPES.MOVE]) {
-            // Add move into list of moves for this tick
-            gridMoves.push(actions[ACTION_TYPES.MOVE]);
-          } else if(actions[ACTION_TYPES.NEW_THING]) {
-            // TODO
-          }
+  grid.iterate((gameObject, x, y) => {
+    if(gameObject != null && gameObjects[gameObject.type] != null) {
+      const actions = gameObjects[gameObject.type].tick({ x, y });
+      if(actions && typeof actions === 'object') {
+        if(actions[ACTION_TYPES.MOVE]) {
+          // Add move into list of moves for this tick
+          gridMoves.push(actions[ACTION_TYPES.MOVE]);
+        } else if(actions[ACTION_TYPES.NEW_THING]) {
+          // TODO
         }
       }
-    });
+    }
   });
 }
 
@@ -79,13 +80,14 @@ function moveGameObjects() {
           && newPosition.y >= 0
           && newPosition.y < WOLRD_HEIGHT
           && (newPosition.x !== oldPosition.x || newPosition.y !== oldPosition.y)) {
-          grid[newPosition.x][newPosition.y] = grid[oldPosition.x][oldPosition.y];
+          // grid[newPosition.x][newPosition.y] = grid[oldPosition.x][oldPosition.y];
+          grid.set(grid.get(oldPosition.x, oldPosition.y), newPosition.x, newPosition.y);
           removeFromOldPosition = true;
         }
 
-        // Nullify objects marked for removal at their old position
+        // Delete objects marked for removal at their old position
         if(removeFromOldPosition) {
-          grid[oldPosition.x][oldPosition.y] = null;
+          grid.delete(oldPosition.x, oldPosition.y);
         }
       }
     });

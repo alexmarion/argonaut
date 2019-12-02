@@ -1,4 +1,4 @@
-/* eslint no-underscore-dangle: ["error", { "allow": ["_iterateRecurse"] }] */
+/* eslint no-underscore-dangle: ["error", { "allow": ["_throwMismatchError", "_iterateRecurse"] }] */
 
 /**
  * @description The Grid is a specialized (potenitally nested) object built to act like an array.
@@ -15,6 +15,15 @@ class Grid {
     }
     this.dimension = {};
     this.dimensions = dimensions;
+  }
+
+  /**
+   * @description Throws a coordinate/dimension mismatch error.
+   * @param {number[]} coordinates
+   * @memberof Grid
+   */
+  _throwMismatchError(coordinates) {
+    throw new Error(`${coordinates.length} coordinates passed does not match ${this.dimensions.length} dimensions declared.`);
   }
 
   /**
@@ -57,7 +66,7 @@ class Grid {
    */
   set(data, ...coordinates) {
     if(coordinates.length !== this.dimensions.length) {
-      throw new Error(`${coordinates.length} coordinates passed does not match ${this.dimensions.length} dimensions declared.`);
+      this._throwMismatchError(coordinates);
     }
     const coordinate = coordinates[0];
     const isLast = coordinates.length === 1;
@@ -72,6 +81,51 @@ class Grid {
   }
 
   /**
+   * @description Test if a grid is empty.
+   * @param {number} coordinate - If defined, tests the grid at the coordinate.
+   * If undefined tests own dimension.
+   * @returns {boolean}
+   * @memberof Grid
+   */
+  isEmpty(coordinate) {
+    if(coordinate != null && !(this.dimension[coordinate] instanceof Grid)) {
+      throw new Error(`The element being tested at ${coordinate} is not an instance of a Grid`);
+    }
+    return Object.getOwnPropertyNames(coordinate == null
+      ? this.dimension
+      : this.dimension[coordinate].dimension).length === 0;
+  }
+
+  /**
+   * @description Delete a data element given a set of coordinates.
+   * This function recursively cleans the grid as it deletes.
+   * @param {...number} coordinates
+   * @returns {*} - true if found and deleted, false if delete fails, null if not found
+   * @memberof Grid
+   */
+  delete(...coordinates) {
+    const coordinate = coordinates[0];
+    // Allow a single coordinate for cleaning
+    if(coordinates.length !== this.dimensions.length && coordinates.length !== 1) {
+      this._throwMismatchError(coordinates);
+    }
+    if(this.dimension[coordinate] == null) {
+      // Not found, return null
+      return null;
+    }
+    if(this.dimension[coordinate] instanceof Grid && !this.isEmpty(coordinate)) {
+      const result = this.dimension[coordinate].delete(...coordinates.slice(1));
+      // If true result and the dimension is now empty, clean it
+      if(result && this.isEmpty(coordinate)) {
+        this.delete(coordinate);
+      }
+      return result;
+    }
+    // Return the result of the deletion
+    return delete this.dimension[coordinate];
+  }
+
+  /**
    * @description Iterates over each element in the grid.
    * @param {Function} fxn - A function with the signature (data, ...coordinates)
    * @memberof Grid
@@ -80,13 +134,22 @@ class Grid {
     this._iterateRecurse(fxn);
   }
 
+  /**
+   * @description An auxiliary method for recursively iterating grids.
+   * DO NOT CALL DIRECTLY FROM OUTSIDE THIS FILE.
+   * @param {Function} fxn
+   * @param {...number} coordinates
+   * @memberof Grid
+   */
   _iterateRecurse(fxn, ...coordinates) {
     const isLast = this.dimensions.length === 1;
     Object.keys(this.dimension).forEach((coordinate) => {
+      const numCoordinate = Number(coordinate);
       if(isLast) {
-        fxn(this.dimension[coordinate], ...coordinates, coordinate);
-      } else {
-        this._iterateRecurse(fxn, ...coordinates, coordinate);
+        fxn(this.dimension[coordinate], ...coordinates, numCoordinate);
+      } else if(this.dimension[coordinate]) {
+        // Convert coordinates to numbers as recursion continues
+        this.dimension[coordinate]._iterateRecurse(fxn, ...coordinates, numCoordinate);
       }
     });
   }
@@ -114,5 +177,19 @@ console.log('grid1', grid1.length); // 4.803202 megabytes
 console.log('grid2', JSON.stringify(grid2.getAll()).length); // 2 bytes
 console.log('grid3', grid3.length); // 35.523202 megabytes
 console.log('grid4', JSON.stringify(grid4.getAll()).length); // 41.116582 megabytes
+
+const grid5 = new Grid(WORLD_WIDTH, WOLRD_HEIGHT);
+grid5.set(1, 50, 50);
+grid5.set(2, 100, 100);
+grid5.set(3, 150, 150);
+grid5.iterate((data, x, y) => {
+  console.log('GOT', data, 'AT', x, y);
+});
+grid5.delete(150, 150);
+grid5.delete(100, 100);
+grid5.delete(50, 50);
+grid5.delete(150, 0);
+console.log(grid5.getAll());
+
 
 module.exports = Grid;

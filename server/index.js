@@ -49,7 +49,7 @@ const sendMessage = (json) => {
 
 // TODO: move this to the world routes file
 setInterval(() => {
-  const gridMessage = JSON.stringify(world.tick());
+  const gridMessage = JSON.stringify(world.tick().getAll());
   sendMessage(gridMessage);
 }, TICK_MS);
 
