@@ -4,8 +4,7 @@ const food = require('./food');
 const {
   ACTION_TYPES,
   GAME_OBJECT_TYPES,
-  WORLD_WIDTH,
-  WOLRD_HEIGHT,
+  GRID_DIMENSIONS,
   STARTING_FOOD_COUNT,
 } = require('../../client/src/constants');
 
@@ -16,37 +15,35 @@ const gameObjects = {
 
 // Helper methods
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-const getRandomGridPosition = () => ({
-  x: getRandomInt(0, WORLD_WIDTH),
-  y: getRandomInt(0, WOLRD_HEIGHT),
-});
+const getRandomGridCoordinates = () => Array.from(
+  { length: GRID_DIMENSIONS.length },
+  (v, i) => getRandomInt(0, GRID_DIMENSIONS[i]),
+);
 
 // Create a grid to save the current state of the world
-const grid = new Grid(WORLD_WIDTH, WOLRD_HEIGHT);
+const grid = new Grid(...GRID_DIMENSIONS);
 
 // Create an array for batching movements. These moves are performed on tick
 let gridMoves = [];
 
 // Fill the grid with initial food
 for(let i = 0; i < STARTING_FOOD_COUNT; i++) {
-  const { x, y } = getRandomGridPosition();
-  grid.set({ type: GAME_OBJECT_TYPES.FOOD, radius: 1 }, x, y);
+  grid.set({ type: GAME_OBJECT_TYPES.FOOD, radius: 1 }, ...getRandomGridCoordinates());
 }
 
 // Place an agent on the grid
-const initialAgentPosition = getRandomGridPosition();
 grid.set({
   type: GAME_OBJECT_TYPES.AGENT,
   radius: 5,
-}, initialAgentPosition.x, initialAgentPosition.y);
+}, ...getRandomGridCoordinates());
 
 /**
  * @description Iterate through the grid and tick each game object.
  */
 function runGameObjectTicks() {
-  grid.iterate((gameObject, x, y) => {
+  grid.iterate((gameObject, ...coordinates) => {
     if(gameObject != null && gameObjects[gameObject.type] != null) {
-      const actions = gameObjects[gameObject.type].tick({ x, y });
+      const actions = gameObjects[gameObject.type].tick(...coordinates);
       if(actions && typeof actions === 'object') {
         if(actions[ACTION_TYPES.MOVE]) {
           // Add move into list of moves for this tick
@@ -67,27 +64,24 @@ function moveGameObjects() {
   if(gridMoves.length) {
     gridMoves.forEach((move) => {
       // Verify that each move is of the correct type
-      if(move != null && typeof move === 'object' && move.oldPosition != null) {
-        const { oldPosition, newPosition } = move;
+      if(move != null && typeof move === 'object' && move.oldCoordinates != null) {
+        const { oldCoordinates, newCoordinates } = move;
 
-        // If newPosition is null the element is removed
-        let removeFromOldPosition = newPosition == null;
+        // If newCoordinates is null the element is removed
+        let removeFromOldCoordinates = newCoordinates == null;
 
-        // Check that the move is legal (and has changed the position)
-        if(!removeFromOldPosition
-          && newPosition.x >= 0
-          && newPosition.x < WORLD_WIDTH
-          && newPosition.y >= 0
-          && newPosition.y < WOLRD_HEIGHT
-          && (newPosition.x !== oldPosition.x || newPosition.y !== oldPosition.y)) {
-          // grid[newPosition.x][newPosition.y] = grid[oldPosition.x][oldPosition.y];
-          grid.set(grid.get(oldPosition.x, oldPosition.y), newPosition.x, newPosition.y);
-          removeFromOldPosition = true;
+        if(!removeFromOldCoordinates
+          // Check that move is legal
+          && newCoordinates.every((c, i) => c >= 0 && c < GRID_DIMENSIONS[i])
+          // Check that position has changed
+          && newCoordinates.some((c, i) => c !== oldCoordinates[i])) {
+          grid.set(grid.get(...oldCoordinates), ...newCoordinates);
+          removeFromOldCoordinates = true;
         }
 
         // Delete objects marked for removal at their old position
-        if(removeFromOldPosition) {
-          grid.delete(oldPosition.x, oldPosition.y);
+        if(removeFromOldCoordinates) {
+          grid.delete(...oldCoordinates);
         }
       }
     });

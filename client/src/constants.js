@@ -9,6 +9,7 @@ module.exports = {
     FOOD: 0,
     AGENT: 1,
   }),
+  GRID_DIMENSIONS: [800, 600], // TODO: need to make the code agnostic to this
   TICK_MS: 1000,
   WORLD_WIDTH: 800,
   WOLRD_HEIGHT: 600,

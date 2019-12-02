@@ -70,49 +70,8 @@ class World extends React.Component {
     // Make sure the tick interval gets cleared
     clearInterval(this.tickInterval);
   }
-  /*
-  tick() {
-    if(this.gridMoves.length) {
-      // Create a copy of the grid
-      const grid = JSON.parse(JSON.stringify(this.state.grid));
-      this.gridMoves.forEach((move) => {
-        const { oldPosition, newPosition } = move;
-        // If newPosition is null the element is removed
-        let removeOld = newPosition == null;
 
-        // Check that the move is legal (and has changed the position)
-        if(!removeOld
-          && newPosition.x >= 0
-          && newPosition.x < WORLD_WIDTH
-          && newPosition.y >= 0
-          && newPosition.y < WOLRD_HEIGHT
-          && (newPosition.x !== oldPosition.x || newPosition.y !== oldPosition.y)) {
-          grid[newPosition.x][newPosition.y] = grid[oldPosition.x][oldPosition.y];
-          removeOld = true;
-        }
-
-        if(removeOld) {
-          grid[oldPosition.x][oldPosition.y] = null;
-        }
-      });
-
-      // Detect any collisions and perform required action(s)
-      // grid.forEach((gridX, x) => {
-      //   gridX.forEach((gameObject, y) => {
-      //     if(gameObject != null) {
-      //     }
-      //   });
-      // });
-
-      // Set the new grid and remove the old moves
-      this.setState({ grid });
-      this.gridMoves = [];
-    }
-
-    this.setState({ tick: this.state.tick === 0 ? 1 : 0 });
-  }
-  */
-
+  // TODO: delete this
   gameObjectMoved(oldPosition, newPosition) {
     this.gridMoves.push({ oldPosition, newPosition });
   }
@@ -129,7 +88,6 @@ class World extends React.Component {
     // console.log(gameObjectID);
     return <GameObjectTag
       key={`${GameObjectTag}-${position.x}-${position.y}`}
-      // tick={this.state.tick}
       position={position}
       radius={gameObject.radius}
       gameObjectMoved={this.gameObjectMoved}
