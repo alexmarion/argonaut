@@ -31,11 +31,13 @@ for(let i = 0; i < STARTING_FOOD_COUNT; i++) {
   grid.set({ type: GAME_OBJECT_TYPES.FOOD, radius: 1 }, ...getRandomGridCoordinates());
 }
 
-// Place an agent on the grid
-grid.set({
-  type: GAME_OBJECT_TYPES.AGENT,
-  radius: 5,
-}, ...getRandomGridCoordinates());
+// Place initial agents on grid
+for(let i = 0; i < 10; i++) {
+  grid.set({
+    type: GAME_OBJECT_TYPES.AGENT,
+    radius: 5,
+  }, ...getRandomGridCoordinates());
+}
 
 /**
  * @description Iterate through the grid and tick each game object.

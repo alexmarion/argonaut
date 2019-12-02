@@ -1,7 +1,7 @@
 import React from 'react';
 import './food.css';
-import { TICK_MS } from '../../constants';
 
+// TODO: this can probably be a stateless component
 class Food extends React.Component {
   constructor(props) {
     super(props);
@@ -9,18 +9,6 @@ class Food extends React.Component {
       radius: this.props.radius,
       timeToLive: 100,
     };
-  }
-
-
-  componentDidMount() {
-    this.timeToLiveInterval = setInterval(() => {
-      if(this.state.timeToLive <= 0) {
-        clearInterval(this.timeToLiveInterval);
-        this.props.gameObjectMoved(this.props.position);
-      } else {
-        this.setState((prevState) => ({ timeToLive: prevState.timeToLive - 2 }));
-      }
-    }, TICK_MS);
   }
 
   componentWillUnmount() {
@@ -32,8 +20,8 @@ class Food extends React.Component {
       <div
         className="food position-absolute bg-success border border-dark"
         style={{
-          top: this.props.position.y,
-          left: this.props.position.x,
+          top: this.props.coordinates[1],
+          left: this.props.coordinates[0],
           opacity: this.state.timeToLive / 100,
           width: `${this.state.radius}vw`,
           height: `${this.state.radius}vw`,
