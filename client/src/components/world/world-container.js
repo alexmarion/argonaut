@@ -2,7 +2,7 @@ import React from 'react';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import Food from '../food';
 import Agent from '../agent';
-import { GAME_OBJECT_TYPES, GRID_DIMENSIONS } from '../../constants';
+import { GAME_OBJECT_TYPES, GRID_DIMENSIONS, TICK_MS } from '../../constants';
 import './world.scss';
 
 // const getRandomID = () => Math.random().toString(36).slice(2);
@@ -44,7 +44,8 @@ class World extends React.Component {
   constructor(props) {
     super(props);
     // Set the initial state to an empty grid
-    this.state = { grid: {} };
+    this.state = { grid: {}, tick: 0 };
+    this.tickQueue = [];
   }
 
   componentDidMount() {
@@ -56,16 +57,39 @@ class World extends React.Component {
       console.log('WebSocket Client Connected');
     };
     websocketClient.onmessage = (message) => {
+      // TODO: introduce a delay and begin to queue messages from the server. This will make the performance faster
       const dataFromServer = JSON.parse(message.data);
       // console.log(message.data);
       console.log('Data from server', `${(message.data.length * 2) / 1000000} MB`);
-      this.setState({ grid: dataFromServer });
-      // TODO: change state based on data received
+      this.tickQueue.push(dataFromServer);
     };
+
+    // Wait 1 seconds before starting tick
+    this.tickTimeout = setTimeout(() => {
+      this.tickInterval = setInterval(() => {
+        const grid = this.tickQueue.pop();
+        this.setState({ grid });
+      }, TICK_MS);
+    }, 1000);
+    // this.tickTimeout = setTimeout(() => {
+    //   // Jumpstart updates
+    //   this.tickInterval = setInterval(() => {
+    //     this.setState((s) => ({ tick: s.tick ? 0 : 1}));
+    //   }, TICK_MS);
+    //   // this.setState({ tick: 1 });
+    // }, 2000);
+  }
+
+  componentDidUpdate() {
+    const grid = this.tickQueue.pop();
+    if(grid) {
+      this.setState({ grid });
+    }
   }
 
   componentWillUnmount() {
-    // Make sure the tick interval gets cleared
+    // Make sure the tick timeout and interval gets cleared
+    clearTimeout(this.tickTimeout);
     clearInterval(this.tickInterval);
   }
 
